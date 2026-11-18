@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # sharp tem binários nativos: não pode ser empacotado
+  external_node_modules = ["sharp"]

@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#050f1e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Imobile SM" />
+  <title>Imobile — Samia Mohamed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #050f1e;
+      --bg-card: #0b1c36;
+      --bg-input: #071326;
+      --border-gold: rgba(218, 178, 99, 0.32);
+      --gold-light: #f6df9d;
+      --gold-mid: #cfa049;
+      --gold-grad: linear-gradient(135deg, #9b6d22 0%, #f7e2a4 35%, #c99940 65%, #fff0be 85%, #94661d 100%);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top, #102a52 0%, #050f1e 55%, #030913 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Topbar */
+    .topbar {
+      background: rgba(5, 15, 30, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-gold);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sm-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #e2bc6e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--gold-light);
+      background: #081830;
+      box-shadow: 0 0 14px rgba(246, 223, 157, 0.2);
+      flex-shrink: 0;
+    }
+
+    .brand-txt h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+    }
+
+    .brand-txt p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Container Central */
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 22px 16px;
+    }
+
+    /* Tela de Login PIN */
+    .pin-wrapper {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .pin-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 18px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .pin-card .sm-badge {
+      width: 72px;
+      height: 72px;
+      font-size: 32px;
+      margin: 0 auto 16px;
+    }
+
+    .pin-card h2 {
+      font-family: 'Cinzel', serif;
+      color: var(--gold-light);
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .pin-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+      line-height: 1.4;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 22px;
+      text-align: center;
+      letter-spacing: 8px;
+      font-weight: 700;
+      background: var(--bg-input);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      color: #fff;
+      margin-bottom: 16px;
+      outline: none;
+    }
+
+    .gold-btn {
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--gold-grad);
+      color: #050f1e;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(207, 160, 73, 0.3);
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    .gold-btn:active { transform: scale(0.99); }
+    .gold-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .secondary-btn {
+      padding: 11px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-gold);
+      background: rgba(11, 28, 54, 0.9);
+      color: var(--gold-light);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .err-msg {
+      color: #fca5a5;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* Cards de Passo */
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--gold-grad);
+      color: #050f1e;
+      font-weight: 800;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sample-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      background: rgba(246, 223, 157, 0.1);
+      border: 1px solid rgba(246, 223, 157, 0.3);
+      color: var(--gold-light);
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    textarea.raw-input {
+      width: 100%;
+      min-height: 135px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+    }
+
+    /* Upload de Fotos */
+    .upload-zone {
+      border: 2px dashed rgba(246, 223, 157, 0.45);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(7, 19, 38, 0.65);
+      cursor: pointer;
+      display: block;
+    }
+
+    .upload-zone strong {
+      display: block;
+      color: var(--gold-light);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .upload-zone span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .thumbs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .thumb-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #cfa049;
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.78);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Seletor de Modelos */
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 650px) {
+      .modes-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .mode-card {
+      background: var(--bg-input);
+      border: 2px solid rgba(218, 178, 99, 0.25);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .mode-card.selected {
+      border-color: var(--gold-light);
+      background: rgba(207, 160, 73, 0.14);
+      box-shadow: 0 0 18px rgba(246, 223, 157, 0.2);
+    }
+
+    .mode-thumb {
+      width: 100%;
+      aspect-ratio: 9 / 14;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(246, 223, 157, 0.3);
+    }
+
+    .auto-box {
+      width: 100%;
+      aspect-ratio: 9 / 14;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: radial-gradient(circle, #143566 0%, #07152b 100%);
+      border: 1px solid rgba(246, 223, 157, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      font-size: 28px;
+    }
+
+    .auto-box small {
+      font-size: 11px;
+      color: var(--gold-light);
+      margin-top: 8px;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .mode-card h4 {
+      font-size: 12px;
+      color: var(--gold-light);
+      margin-bottom: 2px;
+    }
+
+    .mode-card p {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Status & Resultados */
+    .status-banner {
+      background: rgba(16, 42, 82, 0.9);
+      border: 1px solid var(--gold-light);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 18px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .spinner {
+      width: 26px;
+      height: 26px;
+      border: 3px solid rgba(246, 223, 157, 0.25);
+      border-top-color: var(--gold-light);
+      border-radius: 50%;
+      animation: spin 0.85s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-art-box {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .generated-img {
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      border: 2px solid var(--gold-mid);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .caption-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+    }
+
+    .edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .edit-grid { grid-template-columns: 1fr; }
+    }
+
+    .edit-field label {
+      display: block;
+      font-size: 11px;
+      color: var(--gold-light);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .edit-field input {
+      width: 100%;
+      padding: 9px 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-gold);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand-row">
+      <div class="sm-badge">SM</div>
+      <div class="brand-txt">
+        <h1>IMOBILE • SAMIA MOHAMED</h1>
+        <p>Gerador Oficial de Anúncios • CRECI 76026</p>
+      </div>
+    </div>
+    <button class="logout-btn hidden" id="logoutBtn" onclick="logout()">Trocar PIN</button>
+  </header>
+
+  <!-- TELA DE PIN -->
+  <section class="pin-wrapper" id="pinScreen">
+    <div class="pin-card">
+      <div class="sm-badge">SM</div>
+      <h2>Acesso Exclusivo</h2>
+      <p>Digite o código PIN para acessar o gerador oficial de anúncios e legendas.</p>
+      <form onsubmit="handlePinSubmit(event)">
+        <input type="password" inputmode="numeric" class="pin-input" id="pinInput" placeholder="••••••" required />
+        <button type="submit" class="gold-btn" id="pinBtn">Entrar no Estúdio</button>
+        <div class="err-msg hidden" id="pinError"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- APP PRINCIPAL -->
+  <main class="container hidden" id="appScreen">
+
+    <!-- PASSO 1: TEXTO -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title"><span class="step-num">1</span> Informações do Imóvel</div>
+      </div>
+      <div class="sample-chips">
+        <button type="button" class="chip" onclick="fillSample(1)">✨ Ex: Casa c/ Piscina</button>
+        <button type="button" class="chip" onclick="fillSample(2)">✨ Ex: Aluguel Praia</button>
+        <button type="button" class="chip" onclick="fillSample(3)">✨ Ex: Apto Mobiliado</button>
+      </div>
+      <textarea class="raw-input" id="rawText" placeholder="Cole aqui a descrição do WhatsApp ou digite os dados do imóvel (tipo, bairro, cidade, quartos, vagas, diferenciais, valor e condições de pagamento)..."></textarea>
+    </div>
+
+    <!-- PASSO 2: FOTOS -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title"><span class="step-num">2</span> Fotos do Imóvel <small style="font-weight:500;color:#9ca3af;text-transform:none;">(até 6 fotos)</small></div>
+        <button type="button" class="secondary-btn hidden" id="clearPhotosBtn" onclick="clearPhotos()">Limpar fotos</button>
+      </div>
+      <label class="upload-zone">
+        <input type="file" accept="image/*" multiple class="hidden" id="photoInput" onchange="handleFiles(this.files)" />
+        <strong>📸 Toque para selecionar fotos da galeria</strong>
+        <span>Se você enviar fotos reais, elas serão usadas na arte. Se deixar vazio, a IA criará fotos ilustrativas.</span>
+      </label>
+      <div class="thumbs-grid" id="thumbsGrid"></div>
+    </div>
+
+    <!-- PASSO 3: MODELO -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title"><span class="step-num">3</span> Escolha o Layout</div>
+      </div>
+      <div class="modes-grid">
+        <div class="mode-card selected" data-mode="auto" onclick="selectMode('auto')">
+          <div class="auto-box">
+            ✨
+            <small>Escolha Automática pelo De-Para</small>
+          </div>
+          <h4>Automático</h4>
+          <p>IA escolhe o ideal</p>
+        </div>
+
+        <div class="mode-card" data-mode="1" onclick="selectMode(1)">
+          <img src="/refs/modo1.jpg" alt="Modo 1" class="mode-thumb" />
+          <h4>Modo 1</h4>
+          <p>Casa & Condições</p>
+        </div>
+
+        <div class="mode-card" data-mode="2" onclick="selectMode(2)">
+          <img src="/refs/modo2.jpg" alt="Modo 2" class="mode-thumb" />
+          <h4>Modo 2</h4>
+          <p>Curva & Ficha</p>
+        </div>
+
+        <div class="mode-card" data-mode="3" onclick="selectMode(3)">
+          <img src="/refs/modo3.jpg" alt="Modo 3" class="mode-thumb" />
+          <h4>Modo 3</h4>
+          <p>Grade 6 Fotos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTÃO GERAR -->
+    <button type="button" class="gold-btn" id="generateBtn" onclick="runFullGeneration()">
+      ✨ Gerar Anúncio + Legendas com IA
+    </button>
+
+    <!-- STATUS DE PROGRESSO -->
+    <div class="status-banner hidden" id="statusBanner">
+      <div class="spinner"></div>
+      <div>
+        <div style="font-weight:700;color:var(--gold-light);font-size:13px;" id="statusTitle">Processando...</div>
+        <div style="font-size:12px;color:#cbd5e1;margin-top:2px;" id="statusDetail">Analisando dados do imóvel...</div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="resultsArea" class="hidden" style="margin-top:22px;">
+
+      <!-- CARD DA ARTE -->
+      <div class="step-card" id="artCard">
+        <div class="step-header">
+          <div class="step-title">🖼️ Arte Pronta (Formato 9:16)</div>
+          <span style="font-size:11px;color:var(--gold-light);" id="modeReasonBadge"></span>
+        </div>
+
+        <div class="result-art-box" id="artBox">
+          <p style="font-size:13px;color:#cbd5e1;padding:24px 0;" id="artPlaceholder">Gerando imagem em alta definição...</p>
+          <img id="resultImg" class="generated-img hidden" alt="Anúncio Gerado" />
+        </div>
+
+        <div class="action-row hidden" id="artActions">
+          <button type="button" class="gold-btn" style="max-width:260px;" onclick="shareOrDownload()">📲 Compartilhar / Salvar</button>
+          <button type="button" class="secondary-btn" onclick="downloadArt()">⬇️ Baixar Arquivo</button>
+          <button type="button" class="secondary-btn" onclick="toggleEditor()">✏️ Ajustar Textos da Arte</button>
+        </div>
+
+        <!-- EDITOR RÁPIDO DO DE-PARA -->
+        <div id="deParaEditor" class="hidden" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border-gold);">
+          <div style="font-size:12px;font-weight:700;color:var(--gold-light);margin-bottom:6px;">
+            Ajuste fino dos textos mapeados (De-Para):
+          </div>
+          <div class="edit-grid" id="editorFields"></div>
+          <button type="button" class="gold-btn" style="margin-top:14px;" onclick="regenerateImageOnly()">
+            🔄 Regerar Arte com estes Textos
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD DAS LEGENDAS -->
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">📝 Legenda Completa (Feed Instagram / Facebook)</div>
+          <button type="button" class="secondary-btn" onclick="copyText('captionCompleteBox', this)">📋 Copiar Legenda</button>
+        </div>
+        <div class="caption-box" id="captionCompleteBox"></div>
+
+        <div class="step-header" style="margin-top:18px;">
+          <div class="step-title">⚡ Texto Curto (Reels / Stories / WhatsApp)</div>
+          <button type="button" class="secondary-btn" onclick="copyText('captionShortBox', this)">📋 Copiar Curto</button>
+        </div>
+        <div class="caption-box" id="captionShortBox"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let savedPin = localStorage.getItem("sm_studio_pin") || "";
+    let selectedMode = "auto";
+    let activeModeNumber = 1;
+    let uploadedPhotos = []; // [{ mimeType, data, previewUrl }]
+    let currentFields = {};
+    let latestImageDataUrl = "";
+
+    const samples = {
+      1: "Casa de alto padrão com piscina à venda no Balneário Perequê em Porto Belo/SC. Terreno de 360m², 3 suítes amplas + área gourmet integrada, sala com pé-direito duplo, garagem para 2 carros. Valor R$ 1.850.000,00. Entrada a partir de 30%, aceita imóvel de menor valor na região, aceita financiamento bancário e estuda propostas à vista.",
+      2: "Apartamento para locação anual no Balneário Perequê - Porto Belo/SC, a apenas 150 metros da praia! Possui 1 suíte + 2 dormitórios, living integrado, sacada fechada com churrasqueira a carvão, 1 vaga de garagem privativa e salão de festas. Aluguel R$ 4.500/mês com condomínio incluso. Garantia: seguro fiança ou 2 cauções.",
+      3: "Apartamento 100% mobiliado e decorado à venda, pronto para morar! 2 dormitórios, cozinha planejada com eletros, sala integrada aconchegante, condomínio seguro com portaria e ótima localização perto de mercados e escolas. Por apenas R$ 460 mil, aceita financiamento bancário!"
+    };
+
+    const editableLabelsByMode = {
+      1: [
+        ["m1_pre", "Pré-título (ex: CASA À)"],
+        ["m1_main", "Título Dourado (ex: VENDA)"],
+        ["m1_loc", "Bairro – Cidade"],
+        ["m1_cursive", "Frase Cursiva"],
+        ["m1_p1_top", "Pilar 1 Topo"], ["m1_p1_bot", "Pilar 1 Destaque"],
+        ["m1_p2_top", "Pilar 2 Topo"], ["m1_p2_bot", "Pilar 2 Destaque"],
+        ["m1_p3_top", "Pilar 3 Topo"], ["m1_p3_bot", "Pilar 3 Destaque"],
+        ["m1_price", "Valor Principal"],
+        ["m1_price_sub", "Subtítulo do Valor"],
+        ["m1_c1", "Condição 1"],
+        ["m1_c2", "Condição 2"],
+        ["m1_c3", "Condição 3"],
+        ["m1_c4", "Condição 4"],
+        ["m1_note", "Selo Canto Inferior"]
+      ],
+      2: [
+        ["m2_mod", "Modalidade Topo"],
+        ["m2_neighborhood", "Bairro"],
+        ["m2_city", "Cidade/UF"],
+        ["m2_dist", "Pílula Distância / Local"],
+        ["m2_f1", "Destaque 1"],
+        ["m2_f2", "Destaque 2"],
+        ["m2_f3", "Destaque 3"],
+        ["m2_f4", "Destaque 4"],
+        ["m2_f5", "Destaque 5"],
+        ["m2_badge", "Etiqueta Valor"],
+        ["m2_price", "Valor Principal"],
+        ["m2_condo", "Subtítulo Taxas/Condomínio"],
+        ["m2_guarantee", "Caixa Dourada Condição/Garantia"]
+      ],
+      3: [
+        ["m3_cat", "Categoria Topo"],
+        ["m3_highlight", "Palavra Gigante Dourada"],
+        ["m3_mod", "Subtítulo Cursivo"],
+        ["m3_ribbon", "Faixa 3 Palavras"],
+        ["m3_price_lbl", "Acima do Preço"],
+        ["m3_price", "Preço Gigante"],
+        ["m3_h1_t1", "Item 1 Título"], ["m3_h1_t2", "Item 1 Sub"],
+        ["m3_h2_t1", "Item 2 Título"], ["m3_h2_t2", "Item 2 Sub"],
+        ["m3_h3_t1", "Item 3 Título"], ["m3_h3_t2", "Item 3 Sub"],
+        ["m3_plaque1", "Placa Rodapé Linha 1"],
+        ["m3_plaque2", "Placa Rodapé Linha 2"]
+      ]
+    };
+
+    async function checkSavedPin() {
+      if (!savedPin) return;
+      try {
+        const r = await fetch("/api/verify-pin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pin: savedPin })
+        });
+        if (r.ok) {
+          unlockApp();
+        } else {
+          localStorage.removeItem("sm_studio_pin");
+          savedPin = "";
+        }
+      } catch {
+        // aguarda login manual
+      }
+    }
+
+    async function handlePinSubmit(e) {
+      e.preventDefault();
+      const pinVal = document.getElementById("pinInput").value.trim();
+      const btn = document.getElementById("pinBtn");
+      const err = document.getElementById("pinError");
+      err.classList.add("hidden");
+      btn.disabled = true;
+      btn.textContent = "Verificando...";
+
+      try {
+        const res = await fetch("/api/verify-pin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pin: pinVal })
+        });
+        const data = await res.json();
+        if (res.ok && data.valid) {
+          savedPin = pinVal;
+          localStorage.setItem("sm_studio_pin", savedPin);
+          unlockApp();
+        } else {
+          err.textContent = data.error || "Código PIN inválido.";
+          err.classList.remove("hidden");
+        }
+      } catch {
+        err.textContent = "Erro de conexão. Tente novamente.";
+        err.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Entrar no Estúdio";
+      }
+    }
+
+    function unlockApp() {
+      document.getElementById("pinScreen").classList.add("hidden");
+      document.getElementById("appScreen").classList.remove("hidden");
+      document.getElementById("logoutBtn").classList.remove("hidden");
+    }
+
+    function logout() {
+      localStorage.removeItem("sm_studio_pin");
+      savedPin = "";
+      document.getElementById("pinInput").value = "";
+      document.getElementById("appScreen").classList.add("hidden");
+      document.getElementById("logoutBtn").classList.add("hidden");
+      document.getElementById("pinScreen").classList.remove("hidden");
+    }
+
+    function fillSample(n) {
+      document.getElementById("rawText").value = samples[n];
+    }
+
+    function selectMode(m) {
+      selectedMode = m;
+      document.querySelectorAll(".mode-card").forEach(el => {
+        el.classList.toggle("selected", String(el.dataset.mode) === String(m));
+      });
+    }
+
+    function compressImageFile(file, maxDim = 960, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            let { width, height } = img;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL("image/jpeg", quality);
+            const base64 = dataUrl.split(",")[1];
+            resolve({ mimeType: "image/jpeg", data: base64, previewUrl: dataUrl });
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleFiles(fileList) {
+      if (!fileList || !fileList.length) return;
+      for (const file of Array.from(fileList)) {
+        if (uploadedPhotos.length >= 6) break;
+        const compressed = await compressImageFile(file);
+        uploadedPhotos.push(compressed);
+      }
+      document.getElementById("photoInput").value = "";
+      renderThumbs();
+    }
+
+    function renderThumbs() {
+      const grid = document.getElementById("thumbsGrid");
+      const clearBtn = document.getElementById("clearPhotosBtn");
+      grid.innerHTML = "";
+      clearBtn.classList.toggle("hidden", uploadedPhotos.length === 0);
+
+      uploadedPhotos.forEach((p, idx) => {
+        const div = document.createElement("div");
+        div.className = "thumb-item";
+        div.innerHTML = `
+          <img src="${p.previewUrl}" alt="Foto ${idx + 1}" />
+          <button type="button" class="thumb-remove" onclick="removePhoto(${idx})">×</button>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function removePhoto(idx) {
+      uploadedPhotos.splice(idx, 1);
+      renderThumbs();
+    }
+
+    function clearPhotos() {
+      uploadedPhotos = [];
+      renderThumbs();
+    }
+
+    function setStatus(visible, title = "", detail = "") {
+      const banner = document.getElementById("statusBanner");
+      banner.classList.toggle("hidden", !visible);
+      if (visible) {
+        document.getElementById("statusTitle").textContent = title;
+        document.getElementById("statusDetail").textContent = detail;
+      }
+    }
+
+    function buildEditorInputs() {
+      const container = document.getElementById("editorFields");
+      container.innerHTML = "";
+      const list = editableLabelsByMode[activeModeNumber] || [];
+      list.forEach(([key, label]) => {
+        const wrap = document.createElement("div");
+        wrap.className = "edit-field";
+        wrap.innerHTML = `
+          <label>${label}</label>
+          <input type="text" value="${(currentFields[key] || "").replace(/"/g, "&quot;")}" oninput="currentFields['${key}'] = this.value" />
+        `;
+        container.appendChild(wrap);
+      });
+    }
+
+    function toggleEditor() {
+      document.getElementById("deParaEditor").classList.toggle("hidden");
+    }
+
+    async function runFullGeneration() {
+      const rawText = document.getElementById("rawText").value.trim();
+      if (!rawText) {
+        alert("Por favor, cole ou digite as informações do imóvel no Passo 1.");
+        return;
+      }
+
+      const btn = document.getElementById("generateBtn");
+      btn.disabled = true;
+      setStatus(true, "Etapa 1 de 2 — Inteligência De-Para", "Lendo descrição, escolhendo template e escrevendo legendas...");
+
+      try {
+        const analyzeRes = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pin: savedPin,
+            rawText,
+            photoCount: uploadedPhotos.length,
+            preferredMode: selectedMode
+          })
+        });
+
+        const analyzeData = await analyzeRes.json();
+        if (!analyzeRes.ok) {
+          throw new Error(analyzeData.error || "Erro ao analisar o imóvel.");
+        }
+
+        activeModeNumber = [1, 2, 3].includes(Number(analyzeData.chosenMode)) ? Number(analyzeData.chosenMode) : 1;
+        currentFields = analyzeData.fields || {};
+
+        document.getElementById("captionCompleteBox").textContent = analyzeData.captionComplete || "";
+        document.getElementById("captionShortBox").textContent = analyzeData.captionShort || "";
+        document.getElementById("modeReasonBadge").textContent = `Modo ${activeModeNumber} selecionado`;
+        buildEditorInputs();
+
+        document.getElementById("resultsArea").classList.remove("hidden");
+        document.getElementById("resultsArea").scrollIntoView({ behavior: "smooth", block: "start" });
+
+        await streamImageGeneration(rawText);
+      } catch (err) {
+        alert(err.message || String(err));
+        setStatus(false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function regenerateImageOnly() {
+      const rawText = document.getElementById("rawText").value.trim();
+      document.getElementById("deParaEditor").classList.add("hidden");
+      await streamImageGeneration(rawText);
+    }
+
+    async function streamImageGeneration(rawText) {
+      const imgEl = document.getElementById("resultImg");
+      const placeholder = document.getElementById("artPlaceholder");
+      const actions = document.getElementById("artActions");
+
+      imgEl.classList.add("hidden");
+      actions.classList.add("hidden");
+      placeholder.classList.remove("hidden");
+      placeholder.textContent = `Montando arte oficial no Modo ${activeModeNumber} (leva cerca de 15 a 25 segundos)...`;
+
+      setStatus(true, `Etapa 2 de 2 — Gerando Arte (Modo ${activeModeNumber})`, "Aplicando identidade ouro 3D, ícones e fotos...");
+
+      try {
+        const res = await fetch("/api/generate-art", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pin: savedPin,
+            mode: activeModeNumber,
+            fields: currentFields,
+            rawText,
+            photos: uploadedPhotos.map(p => ({ mimeType: p.mimeType, data: p.data }))
+          })
+        });
+
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson.error || `Erro HTTP ${res.status}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            const evt = JSON.parse(line);
+            if (evt.type === "status") {
+              setStatus(true, `Etapa 2 de 2 — Gerando Arte (Modo ${activeModeNumber})`, evt.message);
+            } else if (evt.type === "done" && evt.imageDataUrl) {
+              latestImageDataUrl = evt.imageDataUrl;
+              imgEl.src = latestImageDataUrl;
+              imgEl.classList.remove("hidden");
+              placeholder.classList.add("hidden");
+              actions.classList.remove("hidden");
+            } else if (evt.type === "error") {
+              throw new Error(evt.error);
+            }
+          }
+        }
+      } catch (err) {
+        placeholder.textContent = "⚠️ " + (err.message || String(err));
+      } finally {
+        setStatus(false);
+      }
+    }
+
+    function downloadArt() {
+      if (!latestImageDataUrl) return;
+      const a = document.createElement("a");
+      a.href = latestImageDataUrl;
+      a.download = `anuncio_samia_modo${activeModeNumber}_${Date.now()}.jpg`;
+      a.click();
+    }
+
+    async function shareOrDownload() {
+      if (!latestImageDataUrl) return;
+      try {
+        const res = await fetch(latestImageDataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `anuncio_samia_imoveis.jpg`, { type: blob.type || "image/jpeg" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "Anúncio Samia Mohamed Imóveis",
+            text: document.getElementById("captionShortBox").textContent || "",
+            files: [file]
+          });
+          return;
+        }
+      } catch {
+        // Fallback para download direto
+      }
+      downloadArt();
+    }
+
+    function copyText(id, btn) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text);
+      const old = btn.textContent;
+      btn.textContent = "✅ Copiado!";
+      setTimeout(() => { btn.textContent = old; }, 2000);
+    }
+
+    checkSavedPin();
+  </script>
+</body>
+</html>
