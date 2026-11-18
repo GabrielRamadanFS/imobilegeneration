@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import sharp from "sharp";
 
-process.env.APP_PIN = "123456";
+process.env.APP_PIN = "pin-ficticio-de-teste";
 process.env.GEMINI_API_KEY = "test-key";
 process.env.MAX_PIN_FAILS = "3";
 
@@ -44,7 +44,7 @@ beforeEach(() => {
 
 describe("verify-pin", () => {
   it("aceita o PIN correto", async () => {
-    const res = await verifyPin(post("/api/verify-pin", { pin: "123456" }));
+    const res = await verifyPin(post("/api/verify-pin", { pin: "pin-ficticio-de-teste" }));
     assert.equal(res.status, 200);
     assert.deepEqual(await res.json(), { valid: true });
   });
@@ -57,7 +57,7 @@ describe("verify-pin", () => {
 
   it("bloqueia após muitas tentativas erradas (429), mesmo com o PIN certo", async () => {
     for (let i = 0; i < 3; i++) await verifyPin(post("/api/verify-pin", { pin: "x" }, "9.9.9.9"));
-    const res = await verifyPin(post("/api/verify-pin", { pin: "123456" }, "9.9.9.9"));
+    const res = await verifyPin(post("/api/verify-pin", { pin: "pin-ficticio-de-teste" }, "9.9.9.9"));
     assert.equal(res.status, 429);
   });
 
@@ -82,7 +82,7 @@ describe("analyze", () => {
 
   it("devolve o contrato completo e garante o contato nas legendas", async () => {
     globalThis.fetch = async () => new Response(JSON.stringify(geminiReply()), { status: 200 });
-    const res = await analyze(post("/api/analyze", { pin: "123456", rawText: "Casa 3 quartos pscina 3000,.00 anual", photoCount: 3, preferredMode: "auto" }));
+    const res = await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "Casa 3 quartos pscina 3000,.00 anual", photoCount: 3, preferredMode: "auto" }));
     assert.equal(res.status, 200);
     const out = await res.json();
     assert.equal(out.ok, true);
@@ -94,7 +94,7 @@ describe("analyze", () => {
 
   it("respeita o modo escolhido pelo usuário", async () => {
     globalThis.fetch = async () => new Response(JSON.stringify(geminiReply({ chosenMode: 1 })), { status: 200 });
-    const out = await (await analyze(post("/api/analyze", { pin: "123456", rawText: "apto", preferredMode: 3 }))).json();
+    const out = await (await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "apto", preferredMode: 3 }))).json();
     assert.equal(out.chosenMode, 3);
   });
 
@@ -106,7 +106,7 @@ describe("analyze", () => {
         ? new Response(JSON.stringify({ error: { message: "model not found" } }), { status: 404 })
         : new Response(JSON.stringify(geminiReply()), { status: 200 });
     };
-    const out = await (await analyze(post("/api/analyze", { pin: "123456", rawText: "casa" }))).json();
+    const out = await (await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "casa" }))).json();
     assert.equal(calls.length, 2);
     assert.match(calls[0], /gemini-3-flash-preview/);
     assert.match(calls[1], /gemini-2\.5-flash/);
@@ -115,9 +115,9 @@ describe("analyze", () => {
 
   it("rejeita sem PIN, sem texto e erro do Gemini vira 502 sem vazar detalhes", async () => {
     assert.equal((await analyze(post("/api/analyze", { rawText: "x" }))).status, 401);
-    assert.equal((await analyze(post("/api/analyze", { pin: "123456", rawText: "  " }))).status, 400);
+    assert.equal((await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "  " }))).status, 400);
     globalThis.fetch = async () => new Response(JSON.stringify({ error: { message: "SEGREDO interno" } }), { status: 400 });
-    const res = await analyze(post("/api/analyze", { pin: "123456", rawText: "casa" }));
+    const res = await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "casa" }));
     assert.equal(res.status, 502);
     assert.doesNotMatch(await res.text(), /SEGREDO/);
   });
@@ -175,7 +175,7 @@ describe("generate-art (ponta a ponta, Gemini simulado)", () => {
       throw new Error("fetch inesperado: " + u);
     };
     const photo = (await solid(300, 200, [220, 30, 30]).jpeg().toBuffer()).toString("base64");
-    const res = await generateArt(post("/api/generate-art", { pin: "123456", mode: 2, fields: { m2_price: "R$ 3.000,00" }, rawText: "casa", photos: [{ mimeType: "image/jpeg", data: photo }] }));
+    const res = await generateArt(post("/api/generate-art", { pin: "pin-ficticio-de-teste", mode: 2, fields: { m2_price: "R$ 3.000,00" }, rawText: "casa", photos: [{ mimeType: "image/jpeg", data: photo }] }));
     assert.equal(res.status, 200);
     assert.match(res.headers.get("content-type"), /x-ndjson/);
     const events = await readLines(res);
@@ -193,7 +193,7 @@ describe("generate-art (ponta a ponta, Gemini simulado)", () => {
   it("falha do Gemini vira evento de erro genérico, sem vazar detalhes", async () => {
     globalThis.fetch = async (url) =>
       String(url).includes("/refs/") ? new Response(await keyedTemplate(), { status: 200 }) : new Response(JSON.stringify({ error: { message: "CHAVE inválida xyz" } }), { status: 400 });
-    const res = await generateArt(post("/api/generate-art", { pin: "123456", mode: 1, fields: {}, photos: [] }));
+    const res = await generateArt(post("/api/generate-art", { pin: "pin-ficticio-de-teste", mode: 1, fields: {}, photos: [] }));
     const events = await readLines(res);
     assert.equal(events.at(-1).type, "error");
     assert.doesNotMatch(JSON.stringify(events), /xyz/);
@@ -201,7 +201,7 @@ describe("generate-art (ponta a ponta, Gemini simulado)", () => {
 
   it("valida PIN, modo e campos antes de gastar crédito", async () => {
     assert.equal((await generateArt(post("/api/generate-art", { pin: "errado", mode: 1, fields: {} }))).status, 401);
-    assert.equal((await generateArt(post("/api/generate-art", { pin: "123456", mode: 9, fields: {} }))).status, 400);
-    assert.equal((await generateArt(post("/api/generate-art", { pin: "123456", mode: 1 }))).status, 400);
+    assert.equal((await generateArt(post("/api/generate-art", { pin: "pin-ficticio-de-teste", mode: 9, fields: {} }))).status, 400);
+    assert.equal((await generateArt(post("/api/generate-art", { pin: "pin-ficticio-de-teste", mode: 1 }))).status, 400);
   });
 });
