@@ -27,7 +27,11 @@ export function buildPrompt({ rawText, photoCount, preferredMode }) {
     .join("\n");
   const forced = [1, 2, 3].includes(Number(preferredMode))
     ? `O usuário escolheu o Modo ${Number(preferredMode)}: use exatamente esse modo em chosenMode.`
-    : `Escolha o melhor modo em chosenMode. Com 4 ou mais fotos, o Modo 3 costuma ser a melhor opção.`;
+    : `Escolha o modo em chosenMode pelo TIPO de anúncio, nesta ordem:
+  1) aluguel/locação/temporada → Modo 2;
+  2) apartamento, mobiliado, oportunidade de compra com destaque no preço → Modo 3;
+  3) casa à venda, ou venda com condições de pagamento (entrada, financiamento, permuta, parcelas) → Modo 1.
+  O número de fotos só serve de desempate (Modo 3 aceita até 6 fotos; Modos 1 e 2 usam 3 a 4); nunca troque o tipo do anúncio por causa disso.`;
 
   return `Você é o redator de marketing imobiliário de ${BROKER.name} (CRECI ${BROKER.creci}).
 

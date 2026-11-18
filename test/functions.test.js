@@ -77,7 +77,7 @@ describe("analyze", () => {
   it("schema e prompt cobrem todos os campos dos 3 modos", () => {
     const schema = buildSchema();
     assert.equal(Object.keys(schema.properties.fields.properties).length, ALL_KEYS.length);
-    assert.match(buildPrompt({ rawText: "casa", photoCount: 3, preferredMode: "auto" }), /Escolha o melhor modo/);
+    assert.match(buildPrompt({ rawText: "casa", photoCount: 3, preferredMode: "auto" }), /Escolha o modo em chosenMode pelo TIPO/);
     assert.match(buildPrompt({ rawText: "casa", photoCount: 3, preferredMode: 3 }), /exatamente esse modo/);
   });
 
