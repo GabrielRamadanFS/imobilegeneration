@@ -27,6 +27,10 @@ export function setupFonts() {
     ["montserrat-latin-700-normal.woff", "SM Mont7"],
     ["montserrat-latin-800-normal.woff", "SM Mont8"],
     ["playfair-display-latin-700-normal.woff", "SM Play7"],
+    ["roboto-condensed-latin-400-normal.woff", "SM Cond4"],
+    ["roboto-condensed-latin-500-normal.woff", "SM Cond5"],
+    ["roboto-condensed-latin-700-normal.woff", "SM Cond7"],
+    ["kaushan-script-latin-400-normal.woff", "SM Kaushan"],
   ];
   for (const [file, alias] of list) GlobalFonts.registerFromPath(path.join(dir, file), alias);
   fontsReady = true;
@@ -36,6 +40,12 @@ let logoImg;
 export async function getLogo() {
   if (!logoImg) logoImg = await loadImage(fs.readFileSync(path.join(assetsRoot(), "logo.png")));
   return logoImg;
+}
+
+const assetCache = new Map();
+export async function getAsset(name) {
+  if (!assetCache.has(name)) assetCache.set(name, loadImage(fs.readFileSync(path.join(assetsRoot(), name))));
+  return assetCache.get(name);
 }
 
 let monoImg;
@@ -76,6 +86,10 @@ export const F = {
   m7: (s) => `${s}px "SM Mont7"`,
   m8: (s) => `${s}px "SM Mont8"`,
   play: (s) => `${s}px "SM Play7"`,
+  c4: (s) => `${s}px "SM Cond4"`,
+  c5: (s) => `${s}px "SM Cond5"`,
+  c7: (s) => `${s}px "SM Cond7"`,
+  kaushan: (s) => `${s}px "SM Kaushan"`,
 };
 
 // Largura final da arte (px). 1440 mantém a nitidez em telas de celular; ajustável por ART_WIDTH.

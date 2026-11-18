@@ -2,7 +2,7 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getMonogram, drawLogo, OUT_WIDTH, drawPolyPhoto, goldFrame, goldFrameStroke, goldGradient,
+  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getAsset, getMonogram, drawLogo, OUT_WIDTH, drawPolyPhoto, goldFrame, goldFrameStroke, goldGradient,
   iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, sparkles, star, wrapLines,
 } from "./common.js";
 
@@ -42,11 +42,12 @@ function background(ctx) {
     ctx.fillRect(0, 0, REF_W, REF_H);
   }
   sparkles(ctx, REF_W, REF_H, 70);
-  // canto dourado
-  ctx.beginPath();
-  ctx.moveTo(0, 0); ctx.lineTo(130, 0); ctx.lineTo(0, 118); ctx.closePath();
-  ctx.fillStyle = goldGradient(ctx, 0, 0, 130, 118);
-  ctx.fill();
+  // canto dourado (recorte do modelo, aplicado em drawCorner)
+}
+
+async function corner(ctx) {
+  const img = await getAsset("corner.png");
+  ctx.drawImage(img, 0, 0, 160, 125);
 }
 
 function goldText(ctx, text, x, y, { size, maxW, font = F.anton, depth = 3 }) {
@@ -130,22 +131,23 @@ function seal(ctx) {
   for (const dx of [-16, 0, 16]) star(ctx, cx + dx, 832, 5.5, "#e9bf5c");
 }
 
-function pillars(ctx, f) {
+async function pillars(ctx, f) {
   const cols = [
-    { icon: "house", cx: 76, w: 108, top: f.m1_p1_top, bot: f.m1_p1_bot },
+    { icon: "house", cx: 68, w: 112, top: f.m1_p1_top, bot: f.m1_p1_bot },
     { icon: "pool", cx: 203, w: 126, top: f.m1_p2_top, bot: f.m1_p2_bot },
     { icon: "bed", cx: 349, w: 146, top: f.m1_p3_top, bot: f.m1_p3_bot },
   ];
-  // linhas divisórias
   ctx.save();
   ctx.strokeStyle = "rgba(233,191,92,.55)";
   ctx.lineWidth = 1.5;
-  for (const x of [136, 270]) { ctx.beginPath(); ctx.moveTo(x, 932); ctx.lineTo(x, 1040); ctx.stroke(); }
+  for (const x of [136, 270]) { ctx.beginPath(); ctx.moveTo(x, 922); ctx.lineTo(x, 1040); ctx.stroke(); }
   ctx.restore();
   for (const c of cols) {
-    iconLine(ctx, c.icon, c.cx, 954, 48, goldGradient(ctx, c.cx - 24, 930, c.cx + 24, 978), 2.8);
-    drawFit(ctx, up(c.top), c.cx, 1001, { font: F.m8, size: 15, maxW: c.w, fill: "#fff" });
-    drawFit(ctx, T(c.bot), c.cx, 1030, { font: F.anton, size: 28, maxW: c.w, fill: (s) => goldGradient(ctx, 0, 1008, 0, 1032) });
+    const img = await getAsset(`icon-${c.icon}.png`);
+    const h = 52, w = (img.width / img.height) * h;
+    ctx.drawImage(img, c.cx - w / 2, 925, w, h);
+    drawFit(ctx, up(c.top), c.cx, 1000, { font: F.c5, size: 19, maxW: c.w, fill: "#fff" });
+    drawFit(ctx, up(c.bot), c.cx, 1029, { font: F.anton, size: 28, maxW: c.w, fill: () => goldGradient(ctx, 0, 1006, 0, 1032) });
   }
 }
 
@@ -165,7 +167,7 @@ function priceBox(ctx, f) {
   ctx.fillText("VALOR:", 458, 960);
   ctx.restore();
   goldText(ctx, T(f.m1_price), 592, 1010, { size: 54, maxW: 288, depth: 1.5 });
-  drawFit(ctx, T(f.m1_price_sub), 592, 1030, { font: F.m7, size: 14.5, maxW: 292, fill: "#fff" });
+  drawFit(ctx, T(f.m1_price_sub), 592, 1031, { font: F.c4, size: 18, maxW: 292, fill: "#fff" });
 }
 
 function conditions(ctx, f) {
@@ -179,7 +181,7 @@ function conditions(ctx, f) {
     ctx.strokeStyle = "#0a1a3d"; ctx.lineWidth = 3.2; ctx.lineCap = "round"; ctx.lineJoin = "round";
     ctx.beginPath(); ctx.moveTo(32, cy + 0.5); ctx.lineTo(37.5, cy + 6); ctx.lineTo(47, cy - 6); ctx.stroke();
     ctx.restore();
-    drawFit(ctx, up(text), 63, cy + 6, { font: F.m7, size: 17.5, maxW: 305, fill: "#fff", align: "left" });
+    drawFit(ctx, up(text), 63, cy + 7, { font: F.c4, size: 21, maxW: 305, fill: "#fff", align: "left" });
   });
 }
 
@@ -206,9 +208,9 @@ function note(ctx, f) {
 
   // quebra em linhas: a 1ª no traço azul, as demais no creme
   const words = text.split(/\s+/);
-  let size = 32, lines = [];
+  let size = 30, lines = [];
   for (; size >= 16; size -= 1) {
-    ctx.font = F.script(size);
+    ctx.font = F.kaushan(size);
     lines = wrapLines(ctx, text, 196);
     if (lines.length <= 3 && lines.every((l) => ctx.measureText(l).width <= 196)) break;
   }
@@ -219,13 +221,12 @@ function note(ctx, f) {
     ctx.save();
     ctx.translate(base[i][0], base[i][1]);
     ctx.rotate(ang);
-    ctx.font = F.script(size);
+    ctx.font = F.kaushan(size);
     ctx.textAlign = "center";
     ctx.lineJoin = "round";
     ctx.fillStyle = i === 0 ? "#ffffff" : "#14234a";
     ctx.strokeStyle = ctx.fillStyle;
-    ctx.lineWidth = 0.9;
-    ctx.strokeText(l, 0, 0);
+    ctx.lineWidth = 0;
     ctx.fillText(l, 0, 0);
     ctx.restore();
   });
@@ -255,10 +256,11 @@ export async function renderMode1({ fields, photos: rawPhotos = [] }) {
   const imgs = await Promise.all(rawPhotos.slice(0, 4).map(loadPhoto));
 
   background(ctx);
+  await corner(ctx);
   header(ctx, f, logo);
   photos(ctx, imgs);
   seal(ctx);
-  pillars(ctx, f);
+  await pillars(ctx, f);
   priceBox(ctx, f);
   conditions(ctx, f);
   note(ctx, f);
