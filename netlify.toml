@@ -6,3 +6,5 @@
   node_bundler = "esbuild"
   # sharp tem binários nativos: não pode ser empacotado
   external_node_modules = ["sharp"]
+  # templates das artes (baixados no build para public/refs) vão junto com a função
+  included_files = ["public/refs/**"]

@@ -1,6 +1,7 @@
 import { checkAuth, generationAllowed, registerGeneration } from "./lib/auth.js";
 import { composePhotos, toStoryJpeg } from "./lib/compose.js";
 import { LIMITS } from "./lib/config.js";
+import { loadTemplate } from "./lib/templates.js";
 import { clientIp, json, methodGuard, readJson } from "./lib/http.js";
 import { generateArt } from "./lib/providers/art.js";
 
@@ -38,12 +39,7 @@ export default async (req) => {
       let heartbeat;
       try {
         send({ type: "status", message: `Carregando modelo oficial (Modo ${mode})...` });
-        const tplRes = await fetch(new URL(`/refs/modo${mode}.jpg`, req.url));
-        if (!tplRes.ok) throw new Error(`Template do Modo ${mode} não encontrado (HTTP ${tplRes.status}).`);
-        const template = {
-          base64: Buffer.from(await tplRes.arrayBuffer()).toString("base64"),
-          mimeType: "image/jpeg",
-        };
+        const template = await loadTemplate(mode, req.url);
 
         send({ type: "status", message: "Gerando arte em alta definição (9:16)..." });
         heartbeat = setInterval(
