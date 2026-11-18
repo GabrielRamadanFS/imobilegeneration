@@ -108,9 +108,9 @@ describe("analyze", () => {
     };
     const out = await (await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "casa" }))).json();
     assert.equal(calls.length, 2);
-    assert.match(calls[0], /gemini-3-flash-preview/);
-    assert.match(calls[1], /gemini-2\.5-flash/);
-    assert.equal(out.model, "gemini-2.5-flash");
+    assert.match(calls[0], /gemini-3\.8-flash/);
+    assert.match(calls[1], /gemini-3-flash-preview/);
+    assert.equal(out.model, "gemini-3-flash-preview");
   });
 
   it("rejeita sem PIN, sem texto e erro do Gemini vira 502 sem vazar detalhes", async () => {
@@ -182,7 +182,7 @@ describe("generate-art (ponta a ponta, Gemini simulado)", () => {
     assert.equal(events[0].type, "status");
     const done = events.at(-1);
     assert.equal(done.type, "done");
-    assert.equal(done.modelUsed, "gemini-3-pro-image-preview");
+    assert.equal(done.modelUsed, "gemini-3-pro-image");
     assert.match(done.imageDataUrl, /^data:image\/jpeg;base64,/);
     const img = Buffer.from(done.imageDataUrl.split(",")[1], "base64");
     const meta = await sharp(img).metadata();

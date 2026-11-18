@@ -9,7 +9,7 @@ import { callGemini, textOf } from "../gemini.js";
 async function gemini({ prompt, schema }) {
   const { data, model } = await callGemini(MODELS.text, {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.7 },
+    generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.7, thinkingConfig: { thinkingLevel: "low" } },
   });
   const raw = textOf(data).trim();
   if (!raw) throw new Error("O modelo de texto não retornou conteúdo.");

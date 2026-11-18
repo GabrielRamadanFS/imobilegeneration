@@ -63,7 +63,7 @@ scripts/fetch-assets.sh    baixa refs/modo1-3.jpg e favicon do site antigo
 ## Pontos de atenção (não verificados em produção)
 
 - Os testes simulam o Gemini. A chamada real **ainda não foi testada**: confirme os nomes dos modelos no
-  Google AI Studio (os padrões são `gemini-3-flash-preview` e `gemini-3-pro-image-preview`; o site antigo
+  Google AI Studio (os padrões são `gemini-3.8-flash` e `gemini-3-pro-image`; o site antigo
   registrava `gemini-3-pro-image`).
 - A colagem depende de o modelo obedecer "pintar as áreas de foto de magenta chapado". Se alguma arte sair sem
   áreas detectadas, o servidor avisa no status e mantém a arte do modelo. Nesse caso, ajuste o prompt em

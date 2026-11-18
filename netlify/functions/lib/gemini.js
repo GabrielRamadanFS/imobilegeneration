@@ -5,6 +5,7 @@ const BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 function shouldTryNext(status, message = "") {
   if (status === 404 || status === 429 || status >= 500) return true;
+  if (status === 400 && /thinking/i.test(message)) return true;
   return /not found|deprecated|not supported|no longer available|unavailable/i.test(message);
 }
 
