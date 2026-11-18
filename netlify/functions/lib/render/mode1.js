@@ -2,7 +2,7 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getMonogram, drawLogo, OUT_WIDTH, goldFrame, goldFrameStroke, goldGradient,
+  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getMonogram, drawLogo, OUT_WIDTH, drawPolyPhoto, goldFrame, goldFrameStroke, goldGradient,
   iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, sparkles, star, wrapLines,
 } from "./common.js";
 
@@ -10,12 +10,19 @@ const REF_W = 768;
 const REF_H = 1376;
 const S = OUT_WIDTH / REF_W;
 
-const SLOTS = [
-  { x: 28, y: 310, w: 716, h: 214 },
-  { x: 122, y: 536, w: 630, h: 188 },
-  { x: 122, y: 738, w: 604, h: 168 },
-  { x: 378, y: 1066, w: 372, h: 219 },
+// Mapeamento fiel ao modelo (coordenadas do quadro 768 x 1376, medidas sobre public/refs/modo1.jpg).
+// As 3 primeiras fotos são painéis inclinados; a 4ª é retangular.
+const POLYS = [
+  [[48, 284], [752, 337], [741, 514], [-16, 577]],
+  [[106, 568], [757, 517], [743, 767], [112, 739]],
+  [[112, 739], [743, 767], [714, 923], [86, 907]],
 ];
+const SLOT4 = { x: 378, y: 1066, w: 372, h: 219 };
+const bboxOf = (pts) => {
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const x = Math.min(...xs), y = Math.min(...ys);
+  return [x, y, Math.max(...xs) - x, Math.max(...ys) - y];
+};
 
 const up = (t) => String(t ?? "").toUpperCase();
 const T = (v) => String(v ?? "").trim();
@@ -91,18 +98,13 @@ function header(ctx, f, logo) {
 }
 
 function photos(ctx, imgs) {
-  SLOTS.forEach((s, i) => {
-    goldFrame(ctx, s.x, s.y, s.w, s.h, 8);
-    if (imgs.length) drawCover(ctx, imgs[i % imgs.length], s.x, s.y, s.w, s.h, 8, i === 0 ? 0.55 : 0.5);
-    else drawPhotoPlaceholder(ctx, s.x, s.y, s.w, s.h, 8);
-    goldFrameStroke(ctx, s.x, s.y, s.w, s.h, 8, 4.5);
-    ctx.save();
-    roundRect(ctx, s.x + 5, s.y + 5, s.w - 10, s.h - 10, 5);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "rgba(255,240,180,.45)";
-    ctx.stroke();
-    ctx.restore();
-  });
+  const pick = (i) => (imgs.length ? imgs[i % imgs.length] : null);
+  POLYS.forEach((pts, i) => drawPolyPhoto(ctx, pick(i), pts, bboxOf(pts), 4.5));
+  const s4 = SLOT4;
+  goldFrame(ctx, s4.x, s4.y, s4.w, s4.h, 4);
+  if (imgs.length) drawCover(ctx, pick(3), s4.x, s4.y, s4.w, s4.h, 4, 0.5);
+  else drawPhotoPlaceholder(ctx, s4.x, s4.y, s4.w, s4.h, 4);
+  goldFrameStroke(ctx, s4.x, s4.y, s4.w, s4.h, 4, 4.5);
 }
 
 function seal(ctx) {
@@ -181,32 +183,52 @@ function conditions(ctx, f) {
   });
 }
 
+function poly(ctx, pts) {
+  ctx.beginPath();
+  pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.closePath();
+}
+
+// Faixa "pincelada" sobre a foto 4: traço azul-marinho (1ª linha, texto branco) + traço creme (demais linhas).
 function note(ctx, f) {
   const text = T(f.m1_note);
   if (!text) return;
-  const cx = 654, cy = 1240, w = 216, h = 116;
+  const navy = [[547, 1203], [575, 1196], [610, 1190], [655, 1181], [703, 1170], [740, 1168], [768, 1174], [768, 1212], [700, 1214], [630, 1222], [565, 1228], [552, 1216]];
+  const cream = [[566, 1224], [630, 1217], [700, 1209], [768, 1203], [768, 1282], [742, 1290], [690, 1296], [640, 1294], [600, 1298], [586, 1280], [576, 1262], [568, 1244]];
   ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate((-7 * Math.PI) / 180);
-  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
-  roundRect(ctx, -w / 2, -h / 2, w, h, 6);
-  const g = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
-  g.addColorStop(0, "#fbf3dc"); g.addColorStop(1, "#e7d8b0");
+  ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
+  poly(ctx, navy); ctx.fillStyle = "#0e1c42"; ctx.fill();
+  poly(ctx, cream);
+  const g = ctx.createLinearGradient(566, 1203, 768, 1296);
+  g.addColorStop(0, "#f2dfba"); g.addColorStop(1, "#e3c999");
   ctx.fillStyle = g; ctx.fill();
-  ctx.shadowColor = "transparent";
-  // texto cursivo em até 3 linhas
-  let size = 36, lines = [];
-  for (; size >= 18; size -= 1) {
-    ctx.font = F.script(size);
-    lines = wrapLines(ctx, text, w - 28);
-    if (lines.length <= 3 && lines.length * size * 0.95 <= h - 22 && lines.every((l) => ctx.measureText(l).width <= w - 20)) break;
-  }
-  ctx.fillStyle = "#14234a";
-  ctx.textAlign = "center";
-  const lh = size * 0.95;
-  const y0 = -((lines.length - 1) * lh) / 2 + size * 0.28;
-  lines.forEach((l, i) => ctx.fillText(l, 0, y0 + i * lh));
   ctx.restore();
+
+  // quebra em linhas: a 1ª no traço azul, as demais no creme
+  const words = text.split(/\s+/);
+  let size = 32, lines = [];
+  for (; size >= 16; size -= 1) {
+    ctx.font = F.script(size);
+    lines = wrapLines(ctx, text, 196);
+    if (lines.length <= 3 && lines.every((l) => ctx.measureText(l).width <= 196)) break;
+  }
+  void words;
+  const ang = (-6.5 * Math.PI) / 180;
+  const base = [[657, 1202], [661, 1243], [668, 1276]];
+  lines.slice(0, 3).forEach((l, i) => {
+    ctx.save();
+    ctx.translate(base[i][0], base[i][1]);
+    ctx.rotate(ang);
+    ctx.font = F.script(size);
+    ctx.textAlign = "center";
+    ctx.lineJoin = "round";
+    ctx.fillStyle = i === 0 ? "#ffffff" : "#14234a";
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.lineWidth = 0.9;
+    ctx.strokeText(l, 0, 0);
+    ctx.fillText(l, 0, 0);
+    ctx.restore();
+  });
 }
 
 function footer(ctx) {
