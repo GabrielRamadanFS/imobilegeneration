@@ -2,13 +2,13 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawBackground, drawCover, drawFit, drawPhotoPlaceholder, drawSpaced, fitSize, getLogo, goldFrame,
+  F, drawBackground, drawCover, drawFit, drawPhotoPlaceholder, drawSpaced, fitSize, getMonogram, drawLogo, OUT_WIDTH, goldFrame,
   goldFrameStroke, goldGradient, iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, wrapLines,
 } from "./common.js";
 
 const W = 768;
 const H = 1376;
-const S = 1080 / W;
+const S = OUT_WIDTH / W;
 const T = (v) => String(v ?? "").trim();
 const up = (t) => String(t ?? "").toUpperCase();
 
@@ -38,9 +38,7 @@ function top(ctx, f, logo) {
   ctx.strokeStyle = goldGradient(ctx, 540, 0, 500, 300);
   ctx.beginPath(); ctx.moveTo(548, 0); ctx.lineTo(500, 300); ctx.stroke();
   ctx.restore();
-  const lw = 196;
-  const lh = (logo.height / logo.width) * lw;
-  ctx.drawImage(logo, 560, 40, lw, lh);
+  drawLogo(ctx, logo, 560, 40, 196);
 
   drawSpaced(ctx, up(f.m3_cat), 262, 70, { font: F.m6, size: 24, spacing: 10, fill: "#fff", maxW: 440 });
   goldText(ctx, up(f.m3_highlight), 262, 200, { size: 124, maxW: 470 });
@@ -144,9 +142,9 @@ function footer(ctx, f) {
 export async function renderMode3({ fields, photos: rawPhotos = [] }) {
   setupFonts();
   const f = fields || {};
-  const { canvas, ctx } = newCanvas(1080, Math.round(H * S));
+  const { canvas, ctx } = newCanvas(OUT_WIDTH, Math.round(H * S));
   ctx.scale(S, S);
-  const logo = await getLogo();
+  const logo = await getMonogram();
   const imgs = await Promise.all(rawPhotos.slice(0, 6).map(loadPhoto));
 
   drawBackground(ctx, W, H);
@@ -154,5 +152,5 @@ export async function renderMode3({ fields, photos: rawPhotos = [] }) {
   priceRow(ctx, f);
   grid(ctx, imgs);
   footer(ctx, f);
-  return canvas.encode("jpeg", 92);
+  return canvas.encode("jpeg", 95);
 }

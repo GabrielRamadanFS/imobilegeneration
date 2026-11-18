@@ -2,14 +2,13 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getLogo, goldFrame, goldFrameStroke, goldGradient,
+  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getMonogram, drawLogo, OUT_WIDTH, goldFrame, goldFrameStroke, goldGradient,
   iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, sparkles, star, wrapLines,
 } from "./common.js";
 
 const REF_W = 768;
 const REF_H = 1376;
-const OUT_W = 1080;
-const S = OUT_W / REF_W;
+const S = OUT_WIDTH / REF_W;
 
 const SLOTS = [
   { x: 28, y: 310, w: 716, h: 214 },
@@ -68,9 +67,7 @@ function goldText(ctx, text, x, y, { size, maxW, font = F.anton, depth = 3 }) {
 
 function header(ctx, f, logo) {
   // logo
-  const lw = 236;
-  const lh = (logo.height / logo.width) * lw;
-  ctx.drawImage(logo, 38, 24, lw, lh);
+  drawLogo(ctx, logo, 38, 24, 236);
 
   drawFit(ctx, up(f.m1_pre), 525, 94, { font: F.anton, size: 66, maxW: 440, fill: "#fff", shadow: { blur: 8, y: 3 } });
   goldText(ctx, up(f.m1_main), 525, 196, { size: 132, maxW: 450, font: F.m8, depth: 2.5 });
@@ -230,9 +227,9 @@ function footer(ctx) {
 export async function renderMode1({ fields, photos: rawPhotos = [] }) {
   setupFonts();
   const f = fields || {};
-  const { canvas, ctx } = newCanvas(OUT_W, Math.round(REF_H * S));
+  const { canvas, ctx } = newCanvas(OUT_WIDTH, Math.round(REF_H * S));
   ctx.scale(S, S);
-  const logo = await getLogo();
+  const logo = await getMonogram();
   const imgs = await Promise.all(rawPhotos.slice(0, 4).map(loadPhoto));
 
   background(ctx);
@@ -244,5 +241,5 @@ export async function renderMode1({ fields, photos: rawPhotos = [] }) {
   conditions(ctx, f);
   note(ctx, f);
   footer(ctx);
-  return canvas.encode("jpeg", 92);
+  return canvas.encode("jpeg", 95);
 }

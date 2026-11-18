@@ -7,6 +7,7 @@ const crops = [[28,310,715,215],[200,540,540,190],[110,750,600,160],[380,1070,37
 const photos = [];
 for (const [l,t,w,h] of crops) photos.push({ mimeType: "image/jpeg", data: (await sharp(ref).extract({left:l,top:t,width:w,height:h}).jpeg().toBuffer()).toString("base64") });
 const FIELDS = {
+ 1: { m1_pre:"Casa à", m1_main:"Venda", m1_loc:"Itapema/SC", m1_cursive:"Seu novo lar", m1_p1_top:"Piscina", m1_p1_bot:"Privativa", m1_p2_top:"Terreno", m1_p2_bot:"300 m²", m1_p3_top:"Suítes", m1_p3_bot:"3", m1_price:"R$ 1.290.000", m1_price_sub:"Aceita financiamento", m1_c1:"Entrada facilitada", m1_c2:"Financiamento bancário", m1_c3:"Documentação em dia", m1_c4:"Pronta para morar", m1_note:"Mais que uma casa, seu refúgio particular." },
  2: { m2_mod:"Locação anual |", m2_neighborhood:"Balneário Perequê –", m2_city:"Porto Belo/SC", m2_dist:"150 metros da praia",
   m2_f1:"1 suíte + 2 dormitórios", m2_f2:"Living integrado", m2_f3:"Sacada com churrasqueira a carvão fechada com sistema Reiki", m2_f4:"1 vaga de garagem", m2_f5:"Salão de festas",
   m2_badge:"Aluguel", m2_price:"R$ 4.500/mês", m2_condo:"(Condomínio incluso)", m2_guarantee:"Garantia: seguro fiança ou 2 cauções." },

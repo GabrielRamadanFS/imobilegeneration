@@ -2,13 +2,13 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawBackground, drawCover, drawFit, drawPhotoPlaceholder, drawPolyPhoto, fitSize, getLogo, goldFrame,
+  F, drawBackground, drawCover, drawFit, drawPhotoPlaceholder, drawPolyPhoto, fitSize, getMonogram, drawLogo, OUT_WIDTH, goldFrame,
   goldFrameStroke, goldGradient, iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, wrapLines,
 } from "./common.js";
 
 const W = 768;
 const H = 1376;
-const S = 1080 / W;
+const S = OUT_WIDTH / W;
 const T = (v) => String(v ?? "").trim();
 const up = (t) => String(t ?? "").toUpperCase();
 const ICONS = ["bed", "sofa", "bbq", "car", "party"];
@@ -145,17 +145,15 @@ function footer(ctx, logo) {
   iconFill(ctx, "phone", 64, 1288, 36, "#e9bf5c");
   drawFit(ctx, "AGENDE SUA VISITA:", 118, 1262, { font: F.m7, size: 19, maxW: 300, fill: "#fff", align: "left" });
   drawFit(ctx, BROKER.phone, 118, 1314, { font: F.m8, size: 42, maxW: 360, fill: (s) => goldGradient(ctx, 0, 1280, 0, 1316), align: "left" });
-  const lw = 172;
-  const lh = (logo.height / logo.width) * lw;
-  ctx.drawImage(logo, 568, 1192, lw, lh);
+  drawLogo(ctx, logo, 568, 1192, 172);
 }
 
 export async function renderMode2({ fields, photos: rawPhotos = [] }) {
   setupFonts();
   const f = fields || {};
-  const { canvas, ctx } = newCanvas(1080, Math.round(H * S));
+  const { canvas, ctx } = newCanvas(OUT_WIDTH, Math.round(H * S));
   ctx.scale(S, S);
-  const logo = await getLogo();
+  const logo = await getMonogram();
   const imgs = await Promise.all(rawPhotos.slice(0, 4).map(loadPhoto));
 
   drawBackground(ctx, W, H);
@@ -170,5 +168,5 @@ export async function renderMode2({ fields, photos: rawPhotos = [] }) {
   photos(ctx, imgs);
   priceAndGuarantee(ctx, f);
   footer(ctx, logo);
-  return canvas.encode("jpeg", 92);
+  return canvas.encode("jpeg", 95);
 }

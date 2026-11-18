@@ -29,12 +29,12 @@ const post = (body) =>
 
 describe("gerador local de artes", () => {
   for (const [mode, render] of [[1, renderMode1], [2, renderMode2], [3, renderMode3]]) {
-    it(`Modo ${mode}: desenha 1080 px de largura, com fotos e com campos vazios`, async () => {
+    it(`Modo ${mode}: desenha 1440 px de largura, com fotos e com campos vazios`, async () => {
       const photo = await solid(800, 600, [220, 30, 30]).jpeg().toBuffer();
       const withPhotos = await render({ fields: fieldsFor(mode), photos: [photo, photo] });
       const meta = await sharp(withPhotos).metadata();
       assert.equal(meta.format, "jpeg");
-      assert.equal(meta.width, 1080);
+      assert.equal(meta.width, 1440);
       assert.ok(meta.height > 1500);
       const empty = await render({ fields: {}, photos: [] });
       assert.ok(empty.length > 10_000);
@@ -54,7 +54,7 @@ describe("gerador local de artes", () => {
       assert.equal(done.type, "done", JSON.stringify(done));
       assert.equal(done.modelUsed, "local-render");
       const img = Buffer.from(done.imageDataUrl.split(",")[1], "base64");
-      assert.equal((await sharp(img).metadata()).width, 1080);
+      assert.equal((await sharp(img).metadata()).width, 1440);
       assert.ok(near(await pixel(img, 540, 586), [220, 30, 30]), "a foto enviada deve aparecer no primeiro quadro");
     } finally {
       globalThis.fetch = realFetch;

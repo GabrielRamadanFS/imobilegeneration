@@ -38,6 +38,37 @@ export async function getLogo() {
   return logoImg;
 }
 
+let monoImg;
+export async function getMonogram() {
+  if (!monoImg) monoImg = await loadImage(fs.readFileSync(path.join(assetsRoot(), "monogram.png")));
+  return monoImg;
+}
+
+// Logo SM: monograma (imagem) + nome, profissão e CRECI desenhados por código (ficam nítidos em qualquer tamanho).
+// Ocupa w de largura e ~102% de w de altura, a partir de (x, y).
+export function drawLogo(ctx, mono, x, y, w) {
+  const u = w / 100;
+  const cx = x + w / 2;
+  const mw = 58 * u;
+  const mh = (mono.height / mono.width) * mw;
+  ctx.drawImage(mono, cx - mw / 2, y, mw, mh);
+  const gold = goldGradient(ctx, x, y + 60 * u, x + w, y + 100 * u);
+  drawSpaced(ctx, "SAMIA MOHAMED", cx, y + 71 * u, { font: F.play, size: 11 * u, spacing: 1.4 * u, fill: gold, maxW: w });
+  drawSpaced(ctx, "CORRETORA DE IMÓVEIS", cx, y + 82 * u, { font: F.m6, size: 4.6 * u, spacing: 1.1 * u, fill: "#e9bf5c", maxW: 76 * u });
+  ctx.save();
+  ctx.lineWidth = Math.max(1, 0.5 * u);
+  ctx.strokeStyle = "#e9bf5c";
+  for (const [a, b] of [[x - 1 * u, x + 8 * u], [x + 92 * u, x + 101 * u]]) {
+    ctx.beginPath(); ctx.moveTo(a, y + 80.4 * u); ctx.lineTo(b, y + 80.4 * u); ctx.stroke();
+  }
+  for (const [a, b] of [[x + 12 * u, x + 38 * u], [x + 62 * u, x + 88 * u]]) {
+    ctx.beginPath(); ctx.moveTo(a, y + 91 * u); ctx.lineTo(b, y + 91 * u); ctx.stroke();
+  }
+  ctx.restore();
+  iconLine(ctx, "house", cx, y + 91 * u, 11 * u, "#e9bf5c", Math.max(1.2, 0.7 * u));
+  drawSpaced(ctx, "CRECI 76026", cx, y + 101.5 * u, { font: F.m6, size: 4.6 * u, spacing: 1.3 * u, fill: "#e9bf5c", maxW: 50 * u });
+}
+
 export const F = {
   anton: (s) => `${s}px "SM Anton"`,
   script: (s) => `${s}px "SM Script"`,
@@ -47,9 +78,15 @@ export const F = {
   play: (s) => `${s}px "SM Play7"`,
 };
 
+// Largura final da arte (px). 1440 mantém a nitidez em telas de celular; ajustável por ART_WIDTH.
+export const OUT_WIDTH = Number(process.env.ART_WIDTH) || 1440;
+
 export function newCanvas(w, h) {
   const canvas = createCanvas(w, h);
-  return { canvas, ctx: canvas.getContext("2d") };
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  return { canvas, ctx };
 }
 
 export function goldGradient(ctx, x0, y0, x1, y1) {

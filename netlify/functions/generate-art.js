@@ -59,7 +59,8 @@ export default async (req) => {
           }
           finalBuf = await toStoryJpeg(composed.image);
         } else {
-          finalBuf = await toStoryJpeg(art.buffer);
+          // A arte local já sai pronta e nítida: não recomprime. O caminho Gemini ainda reduz para 1080.
+          finalBuf = art.keyed === false && art.model === "local-render" ? art.buffer : await toStoryJpeg(art.buffer);
         }
 
         send({
