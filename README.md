@@ -1,45 +1,59 @@
 # imobilegeneration
 
-Gerador de anúncios imobiliários (Imobile — Samia Mohamed). Recria o site `imobile-sm.netlify.app`:
-o usuário cola a descrição do imóvel, envia fotos e recebe uma arte 9:16 + legendas.
+Gerador de anúncios imobiliários (Imobile — Samia Mohamed). A usuária cola a descrição do imóvel, envia fotos e
+recebe uma arte 9:16 + legendas. Nada é gravado: se a aba for fechada, a arte some (sem histórico, por escolha).
 
-- **Front-end:** `public/index.html` (página única, sem build).
-- **Back-end:** funções do Netlify em `netlify/functions/` (rotas `/api/*`).
-- **IA:** Gemini para texto e imagem, atrás de uma camada que permite trocar de motor.
-- **Fotos reais:** o modelo de imagem NÃO redesenha as fotos do cliente. Ele pinta as áreas de foto em
-  magenta e o servidor cola as fotos reais por cima (`lib/compose.js`).
+**Em produção:** https://imobile-sm.onrender.com (Render, plano grátis, deploy do branch `main`).
+
+## Como funciona hoje
+
+- **Front-end:** `public/index.html` (página única, sem build). Modo "Automático" escolhe o layout pelo tipo de anúncio.
+- **Servidor:** `server.js` (Node) serve `public/` e as rotas `/api/*`, reaproveitando as funções em
+  `netlify/functions/` (mesmo código roda no Netlify ou em qualquer Node). Gera uma arte por vez (memória).
+- **Arte (sem IA de imagem, sem custo):** `netlify/functions/lib/render-svg/` monta cada modo como SVG
+  (ouro com relevo/brilho por filtros, fotos recortadas em polígonos, texto vetorizado com opentype.js) e rasteriza
+  com `@resvg/resvg-js` + `sharp` → JPEG. Largura padrão 1080 px (`ART_WIDTH`). Fontes TTF em `assets/fonts-ttf`,
+  ícones SVG (Lucide/Tabler) em `assets/icons` (ver `assets/icons/README.md`).
+  `ART_RENDERER=canvas` volta ao desenho antigo por `@napi-rs/canvas` (`lib/render/`), mantido como reserva.
+- **Texto (Gemini, gratuito):** só interpreta a descrição (campos), escolhe o modo e escreve as legendas.
+  Sem `GEMINI_API_KEY` o Automático e as legendas deixam de funcionar; escolhendo o modo à mão e preenchendo os
+  campos a arte sai sem Gemini.
+
+## Variáveis de ambiente
+
+`APP_PIN` e `GEMINI_API_KEY` (obrigatórias; configuradas no Render, nunca no repositório). Opcionais: `ART_WIDTH`
+(padrão 1080), `ART_RENDERER` (`svg`|`canvas`), `ART_PROVIDER` (`local`|`gemini`), `TEXT_PROVIDER`.
+
+## Rodar e publicar
+
+- Local: `npm install`, `APP_PIN=... GEMINI_API_KEY=... npm start` → http://localhost:8888. Testes: `npm test`.
+- Render: o `render.yaml` define o serviço (Node, plano grátis). **O Render não atualiza sozinho depois do push:**
+  em Manual Deploy > Deploy latest commit. O plano grátis dorme após ~15 min parado (1º acesso demora ~50 s) e
+  cada arte leva ~20–25 s lá (≈3 s num PC comum).
+- Netlify (alternativa): `netlify.toml` continua válido, mas o plano grátis pausa deploys quando os créditos acabam.
 
 ## Estrutura
 
 ```
-public/                    site estático (index.html, refs/modo1-3.jpg, favicon.ico)
-netlify/functions/
-  verify-pin.js            POST /api/verify-pin
-  analyze.js               POST /api/analyze        (escolhe layout, campos, legendas)
-  generate-art.js          POST /api/generate-art   (arte em streaming NDJSON)
-  lib/
-    config.js              corretora, modelos, limites, descrição dos modos
-    fields.js              campos de texto de cada modo
-    auth.js                PIN (comparação segura) + limites de tentativas/gerações
-    gemini.js              cliente do Gemini com modelos de reserva
-    compose.js             detecção das áreas magenta + colagem das fotos (sharp)
-    providers/text.js      provedor de texto (TEXT_PROVIDER)
-    providers/art.js       provedor de arte (ART_PROVIDER) + prompt da arte
-test/functions.test.js     16 testes (Gemini simulado)
-scripts/fetch-assets.sh    baixa refs/modo1-3.jpg e favicon do site antigo
+public/                    site estático (index.html, refs/modo1-3.jpg)
+refs-hd/                   modelos originais em alta resolução (referência de fidelidade)
+server.js, render.yaml     servidor Node e blueprint do Render
+netlify/functions/         verify-pin, analyze, generate-art + lib/ (config, fields, auth, gemini, providers,
+                           render-svg = motor atual, render = motor canvas de reserva)
+assets/                    fonts-ttf, fonts (woff), icons (svg), monogram/logo/corner (png)
+scripts/                   preview-modes.mjs (gera /tmp/outN.jpg), overlay.mjs (modelo x render), sample-fields-*.json
+experiments/               comparativo de motores (Satori, Chromium, SVG) - só histórico; o SVG foi o escolhido
+test/                      testes (Gemini simulado)
 ```
 
-## Como colocar no ar
+## Pendências / ideias
 
-1. **Arquivos estáticos que faltam** (rode no seu computador, com internet):
-   `sh scripts/fetch-assets.sh` baixa `public/refs/modo1-3.jpg` e `public/favicon.ico` do site antigo.
-   Sem os `modoN.jpg` a geração de arte não funciona (são os templates enviados ao modelo).
-2. **Netlify:** Add new site > Import from Git > escolha este repositório.
-   Publish directory `public`, functions `netlify/functions` (já estão no `netlify.toml`).
-3. **Variáveis de ambiente** (Site configuration > Environment variables), conforme `.env.example`:
-   obrigatórias `APP_PIN` e `GEMINI_API_KEY`. Nunca commite o `.env`.
-4. Para testar local: `npm install`, copie `.env.example` para `.env`, `npm run dev` (precisa do Netlify CLI).
-5. Testes: `npm test`.
+- Refinar fidelidade dos Modos 2 e 3 contra `refs-hd` ("à Venda" encosta em "MOBILIADO" no Modo 3; textos laterais
+  um pouco pequenos; Modo 2 sem o painel azul curvo do rodapé e foto principal mais larga que o modelo).
+- Velocidade no Render grátis: reduzir `ART_WIDTH` (ex.: 900) ou aliviar blurs/filtros SVG.
+- Modo sem Gemini (interpretação por regras e legendas fixas), se a cota/instabilidade incomodar.
+- PNGs antigos (`assets/icon-*`, `m2-*`, `m3-*`) não são mais usados e podem ser apagados.
+- Higiene: trocar o PIN/chave se vazarem; o PIN ainda trafega em cada chamada (melhoria: token de sessão).
 
 ## Contrato das APIs (compatível com o front-end original)
 
@@ -62,21 +76,3 @@ scripts/fetch-assets.sh    baixa refs/modo1-3.jpg e favicon do site antigo
   Mesmo contrato nos dois: `generateArt -> {buffer, model, keyed}`.
 - Os templates em `public/refs` ficam commitados; o script `scripts/fetch-assets.sh` só baixa o que faltar.
 
-## Pontos de atenção (não verificados em produção)
-
-- Os testes simulam o Gemini. A chamada real **ainda não foi testada**: confirme os nomes dos modelos no
-  Google AI Studio (os padrões são `gemini-3.8-flash` e `gemini-3-pro-image`; o site antigo
-  registrava `gemini-3-pro-image`).
-- A colagem depende de o modelo obedecer "pintar as áreas de foto de magenta chapado". Se alguma arte sair sem
-  áreas detectadas, o servidor avisa no status e mantém a arte do modelo. Nesse caso, ajuste o prompt em
-  `lib/providers/art.js` ou use coordenadas fixas por modo.
-- Quais modos usam quantas fotos (provavelmente 1, 1 e 6) é suposição: a lógica usa quantas áreas magenta
-  encontrar e repete fotos se faltarem.
-- A escolha automática de modo (venda com condições → 1, locação → 2, destaque com várias fotos → 3) foi
-  deduzida dos exemplos do site antigo; ajuste em `lib/config.js` (`MODE_INFO`).
-- Limites de PIN/gerações ficam em memória, por instância da função: reduzem abuso, mas não são globais.
-  Se precisar de limite exato, use um armazenamento externo (ex.: Netlify Blobs).
-- Tempo de execução: a geração leva ~15 s; a resposta em streaming mantém a conexão viva, mas confira o
-  limite de tempo das funções no seu plano do Netlify.
-- O PIN ainda trafega em cada chamada (como no site original). Uma melhoria futura é trocá-lo por um token
-  de sessão.
