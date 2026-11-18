@@ -8,22 +8,26 @@ function shouldTryNext(status, message = "") {
   return /not found|deprecated|not supported|no longer available|unavailable/i.test(message);
 }
 
-export async function callGemini(models, body, { signal } = {}) {
+// Tempo máximo por modelo. A função do Netlify morre aos 30 s; sem limite, um modelo travado
+// consome tudo e o de reserva nunca é tentado.
+export async function callGemini(models, body, { signal, timeoutMs = 12000 } = {}) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY não configurada no servidor.");
 
   let lastError;
   for (const model of models) {
+    const timer = AbortSignal.timeout(timeoutMs);
     try {
       const res = await fetch(`${BASE}/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": key },
         body: JSON.stringify(body),
-        signal,
+        signal: signal ? AbortSignal.any([signal, timer]) : timer,
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const message = data?.error?.message || `Gemini HTTP ${res.status}`;
+        console.error(`gemini ${model}: HTTP ${res.status} ${message.slice(0, 200)}`);
         const err = new Error(message);
         err.status = res.status;
         if (shouldTryNext(res.status, message)) {
@@ -34,6 +38,11 @@ export async function callGemini(models, body, { signal } = {}) {
       }
       return { data, model };
     } catch (err) {
+      if (err.name === "TimeoutError" || (err.name === "AbortError" && timer.aborted)) {
+        console.error(`gemini ${model}: sem resposta em ${timeoutMs} ms`);
+        lastError = Object.assign(new Error(`Timeout em ${model}`), { code: "timeout" });
+        continue;
+      }
       if (err.name === "AbortError") throw err;
       if (err.status && !shouldTryNext(err.status, err.message)) throw err;
       lastError = err;
