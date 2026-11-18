@@ -14,8 +14,8 @@ export const PROVIDERS = {
 };
 
 export const MODELS = {
-  text: [process.env.GEMINI_TEXT_MODEL || "gemini-3.8-flash", ...list(process.env.GEMINI_TEXT_FALLBACKS || "gemini-3-flash-preview")],
-  image: [process.env.GEMINI_IMAGE_MODEL || "gemini-3-pro-image", ...list(process.env.GEMINI_IMAGE_FALLBACKS || "gemini-3.1-flash-image,gemini-2.5-flash-image")],
+  text: [process.env.GEMINI_TEXT_MODEL || "gemini-3.8-flash", ...list(process.env.GEMINI_TEXT_FALLBACKS || "gemini-3.5-flash-lite,gemini-3.6-flash,gemini-3.1-flash-lite,gemini-3-flash-preview")],
+  image: [process.env.GEMINI_IMAGE_MODEL || "gemini-3-pro-image", ...list(process.env.GEMINI_IMAGE_FALLBACKS || "gemini-nano-banana-2.1,gemini-3.1-flash-image,gemini-3.1-flash-lite-image")],
 };
 
 export const LIMITS = {

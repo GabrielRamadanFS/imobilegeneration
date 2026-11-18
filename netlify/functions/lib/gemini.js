@@ -11,13 +11,18 @@ function shouldTryNext(status, message = "") {
 
 // Tempo máximo por modelo. A função do Netlify morre aos 30 s; sem limite, um modelo travado
 // consome tudo e o de reserva nunca é tentado.
-export async function callGemini(models, body, { signal, timeoutMs = 12000 } = {}) {
+export async function callGemini(models, body, { signal, timeoutMs = 8000, budgetMs = 26000 } = {}) {
+  const startedAt = Date.now();
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY não configurada no servidor.");
 
   let lastError;
   for (const model of models) {
-    const timer = AbortSignal.timeout(timeoutMs);
+    // Orçamento total: a função inteira morre aos 30 s, então cada modelo recebe só o tempo que sobrou.
+    const left = budgetMs - (Date.now() - startedAt);
+    if (left < 2500) break;
+    const limit = Math.min(timeoutMs, left);
+    const timer = AbortSignal.timeout(limit);
     try {
       const res = await fetch(`${BASE}/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
@@ -40,7 +45,7 @@ export async function callGemini(models, body, { signal, timeoutMs = 12000 } = {
       return { data, model };
     } catch (err) {
       if (err.name === "TimeoutError" || (err.name === "AbortError" && timer.aborted)) {
-        console.error(`gemini ${model}: sem resposta em ${timeoutMs} ms`);
+        console.error(`gemini ${model}: sem resposta em ${limit} ms`);
         lastError = Object.assign(new Error(`Timeout em ${model}`), { code: "timeout" });
         continue;
       }

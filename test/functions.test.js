@@ -109,8 +109,8 @@ describe("analyze", () => {
     const out = await (await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "casa" }))).json();
     assert.equal(calls.length, 2);
     assert.match(calls[0], /gemini-3\.8-flash/);
-    assert.match(calls[1], /gemini-3-flash-preview/);
-    assert.equal(out.model, "gemini-3-flash-preview");
+    assert.match(calls[1], /gemini-3\.5-flash-lite/);
+    assert.equal(out.model, "gemini-3.5-flash-lite");
   });
 
   it("rejeita sem PIN, sem texto e erro do Gemini vira 502 sem vazar detalhes", async () => {

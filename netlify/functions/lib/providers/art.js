@@ -45,7 +45,7 @@ async function gemini({ mode, template, fields, hasPhotos, signal }) {
       ],
       generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "9:16" } },
     },
-    { signal, timeoutMs: Number(process.env.ART_TIMEOUT_MS || 28000) },
+    { signal, timeoutMs: Number(process.env.ART_TIMEOUT_MS || 28000), budgetMs: 28000 },
   );
   const img = imageOf(data);
   if (!img) {
