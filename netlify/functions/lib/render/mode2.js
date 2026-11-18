@@ -4,7 +4,7 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, OUT_WIDTH, getAsset, drawBackground, drawFit, drawLogo, drawPolyPhoto, getMonogram, goldGradient, iconFill, iconLine,
+  F, OUT_WIDTH, drawIcon, GOLD_ICON, drawBackground, drawFit, drawLogo, drawPolyPhoto, getMonogram, goldGradient, iconFill, iconLine,
   loadPhoto, newCanvas, roundRect, setupFonts, wrapLines,
 } from "./common.js";
 
@@ -115,9 +115,7 @@ async function features(ctx, f) {
   const items = [f.m2_f1, f.m2_f2, f.m2_f3, f.m2_f4, f.m2_f5].map(T).filter(Boolean);
   for (const [i, text] of items.entries()) {
     const cy = Y(ROWS[i]);
-    const ic = await getAsset(`m2-${ICONS[i]}.png`);
-    const ih = 50 * K, iw = Math.min(X(46), (ic.width / ic.height) * ih);
-    ctx.drawImage(ic, X(46) - iw / 2, cy - ih / 2, iw, ih);
+    await drawIcon(ctx, ICONS[i], X(46), cy, 46 * K, { gradient: GOLD_ICON, stroke: 1.5 });
     const mw = X(150);
     let size = 21 * K, lines = [];
     for (; size >= 12; size -= 0.5) {
@@ -226,9 +224,7 @@ function priceAndGuarantee(ctx, f) {
 
 async function footer(ctx, mono) {
   const cy = Y(957);
-  const wa = await getAsset("m2-whats.png");
-  const wh = 68 * K;
-  ctx.drawImage(wa, X(60) - ((wa.width / wa.height) * wh) / 2, cy - wh / 2, (wa.width / wa.height) * wh, wh);
+  await drawIcon(ctx, "whatsapp", X(60), cy, 64 * K, { gradient: GOLD_ICON, stroke: 1.6 });
   drawFit(ctx, "AGENDE SUA VISITA:", X(110), Y(948), { font: F.m6, size: 17.5 * K, maxW: X(260), fill: "#e9d28f", align: "left" });
   drawFit(ctx, BROKER.phone, X(108), Y(988), { font: F.m8, size: 42 * K, maxW: X(300), fill: () => goldGradient(ctx, 0, Y(958), 0, Y(990)), align: "left" });
   drawLogo(ctx, mono, X(498), Y(826), X(172));

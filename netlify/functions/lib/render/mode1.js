@@ -2,7 +2,7 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getAsset, getMonogram, drawLogo, OUT_WIDTH, drawPolyPhoto, goldFrame, goldFrameStroke, goldGradient,
+  F, drawCover, drawFit, drawPhotoPlaceholder, fitSize, getAsset, drawIcon, GOLD_ICON, getMonogram, drawLogo, OUT_WIDTH, drawPolyPhoto, goldFrame, goldFrameStroke, goldGradient,
   iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, sparkles, star, wrapLines,
 } from "./common.js";
 
@@ -143,9 +143,7 @@ async function pillars(ctx, f) {
   for (const x of [136, 270]) { ctx.beginPath(); ctx.moveTo(x, 922); ctx.lineTo(x, 1040); ctx.stroke(); }
   ctx.restore();
   for (const c of cols) {
-    const img = await getAsset(`icon-${c.icon}.png`);
-    const h = 52, w = (img.width / img.height) * h;
-    ctx.drawImage(img, c.cx - w / 2, 925, w, h);
+    await drawIcon(ctx, c.icon, c.cx, 951, 54, { color: "#ffffff", stroke: 1.7 });
     drawFit(ctx, up(c.top), c.cx, 1000, { font: F.c5, size: 19, maxW: c.w, fill: "#fff" });
     drawFit(ctx, up(c.bot), c.cx, 1029, { font: F.anton, size: 28, maxW: c.w, fill: () => goldGradient(ctx, 0, 1006, 0, 1032) });
   }
@@ -232,12 +230,12 @@ function note(ctx, f) {
   });
 }
 
-function footer(ctx) {
+async function footer(ctx) {
   ctx.fillStyle = "#040b1f";
   ctx.fillRect(0, 1301, REF_W, 75);
   ctx.fillStyle = goldGradient(ctx, 0, 1299, REF_W, 1303);
   ctx.fillRect(0, 1298, REF_W, 4);
-  iconLine(ctx, "calendar", 62, 1338, 52, goldGradient(ctx, 36, 1312, 88, 1364), 2.6);
+  await drawIcon(ctx, "calendar", 62, 1338, 54, { gradient: GOLD_ICON, stroke: 1.6 });
   drawFit(ctx, "AGENDE SUA VISITA:", 100, 1352, { font: F.anton, size: 30, maxW: 232, fill: "#fff", align: "left" });
   roundRect(ctx, 338, 1309, 414, 60, 30);
   ctx.fillStyle = goldGradient(ctx, 338, 1309, 752, 1369);
@@ -264,6 +262,6 @@ export async function renderMode1({ fields, photos: rawPhotos = [] }) {
   priceBox(ctx, f);
   conditions(ctx, f);
   note(ctx, f);
-  footer(ctx);
+  await footer(ctx);
   return canvas.encode("jpeg", 95);
 }

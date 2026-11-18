@@ -8,6 +8,7 @@
 import { MODELS, MODE_INFO, PROVIDERS } from "../config.js";
 import { FIELDS_BY_MODE } from "../fields.js";
 import { blockReason, callGemini, imageOf } from "../gemini.js";
+import { renderSvgMode } from "../render-svg/index.js";
 import { renderMode1 } from "../render/mode1.js";
 import { renderMode2 } from "../render/mode2.js";
 import { renderMode3 } from "../render/mode3.js";
@@ -63,10 +64,13 @@ const RENDERERS = { 1: renderMode1, 2: renderMode2, 3: renderMode3 };
 
 // Gerador local: a arte já sai pronta (textos e fotos reais incluídos), sem etapa de magenta.
 async function local({ mode, fields, photos = [] }) {
-  const render = RENDERERS[mode];
-  if (!render) throw new Error(`Modo ${mode} sem layout local.`);
-  const buffer = await render({ fields, photos });
-  return { buffer, model: "local-render", keyed: false };
+  // padrão: SVG + resvg (ouro com relevo/brilho). ART_RENDERER=canvas volta ao desenho por @napi-rs/canvas.
+  if ((process.env.ART_RENDERER || "svg") === "canvas") {
+    const render = RENDERERS[mode];
+    if (!render) throw new Error(`Modo ${mode} sem layout local.`);
+    return { buffer: await render({ fields, photos }), model: "local-render", keyed: false };
+  }
+  return { buffer: await renderSvgMode(mode, { fields, photos }), model: "local-render", keyed: false };
 }
 
 const PROVIDERS_ART = { local, gemini };

@@ -48,6 +48,34 @@ export async function getAsset(name) {
   return assetCache.get(name);
 }
 
+// Ícones SVG (assets/icons): desenhados em alta resolução e pintados com cor sólida ou gradiente vertical.
+const iconCache = new Map();
+export async function drawIcon(ctx, name, cx, cy, size, { color = "#fff", gradient, stroke = 1.8 } = {}) {
+  const key = `${name}|${color}|${gradient ? gradient.join(",") : ""}|${stroke}`;
+  let cv = iconCache.get(key);
+  if (!cv) {
+    const R = 256;
+    let svg = fs.readFileSync(path.join(assetsRoot(), "icons", `${name}.svg`), "utf8");
+    svg = svg.replace(/<!--[\s\S]*?-->/g, "").replace(/currentColor/g, "#000")
+      .replace(/stroke-width="[^"]*"/, `stroke-width="${stroke}"`)
+      .replace(/width="24"/, `width="${R}"`).replace(/height="24"/, `height="${R}"`);
+    const img = await loadImage(Buffer.from(svg));
+    cv = createCanvas(R, R);
+    const c = cv.getContext("2d");
+    c.drawImage(img, 0, 0, R, R);
+    c.globalCompositeOperation = "source-in";
+    if (gradient) {
+      const g = c.createLinearGradient(0, 0, R, R);
+      g.addColorStop(0, gradient[0]); g.addColorStop(1, gradient[1]);
+      c.fillStyle = g;
+    } else c.fillStyle = color;
+    c.fillRect(0, 0, R, R);
+    iconCache.set(key, cv);
+  }
+  ctx.drawImage(cv, cx - size / 2, cy - size / 2, size, size);
+}
+export const GOLD_ICON = ["#f7e08a", "#c8902c"];
+
 let monoImg;
 export async function getMonogram() {
   if (!monoImg) monoImg = await loadImage(fs.readFileSync(path.join(assetsRoot(), "monogram.png")));

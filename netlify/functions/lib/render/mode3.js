@@ -4,7 +4,7 @@
 
 import { BROKER } from "../config.js";
 import {
-  F, OUT_WIDTH, getAsset, drawBackground, drawFit, drawLogo, drawPhotoPlaceholder, drawSpaced, fitSize, getMonogram, goldGradient,
+  F, OUT_WIDTH, drawIcon, GOLD_ICON, drawBackground, drawFit, drawLogo, drawPhotoPlaceholder, drawSpaced, fitSize, getMonogram, goldGradient,
   iconFill, iconLine, loadPhoto, newCanvas, roundRect, setupFonts, wrapLines,
 } from "./common.js";
 
@@ -120,9 +120,7 @@ async function highlights(ctx, f) {
     ["pin", f.m3_h3_t1, f.m3_h3_t2, 384, 385, 400],
   ];
   for (const [icon, t1, t2, iy, ty, sy] of rows) {
-    const ic = await getAsset(`m3-${icon}.png`);
-    const ih = 34 * K, iw = (ic.width / ic.height) * ih;
-    ctx.drawImage(ic, X(416) - iw / 2, Y(iy) - ih / 2, iw, ih);
+    await drawIcon(ctx, icon, X(416), Y(iy), 34 * K, { gradient: GOLD_ICON, stroke: 1.6 });
     drawFit(ctx, up(t1), X(444), Y(ty), { font: F.m7, size: 16 * K, maxW: X(220), fill: "#fff", align: "left" });
     drawFit(ctx, up(t2), X(444), Y(sy), { font: F.m6, size: 11.5 * K, maxW: X(220), fill: "#cdd3e0", align: "left" });
   }
@@ -163,7 +161,7 @@ function grid(ctx, imgs) {
   ctx.restore();
 }
 
-function footer(ctx, f) {
+async function footer(ctx, f) {
   // fio curvo dourado
   ctx.save();
   ctx.lineWidth = 3; ctx.strokeStyle = goldGradient(ctx, 0, 0, X(340), 0);
@@ -173,7 +171,7 @@ function footer(ctx, f) {
   const ix = X(30), iy = Y(928), is = 54 * K;
   roundRect(ctx, ix, iy, is, is, 12 * K);
   ctx.fillStyle = goldGradient(ctx, ix, iy, ix + is, iy + is); ctx.fill();
-  iconFill(ctx, "phone", ix + is / 2, iy + is / 2, 34 * K, "#0a1a3d");
+  await drawIcon(ctx, "phone", ix + is / 2, iy + is / 2, 34 * K, { color: "#0a1a3d", stroke: 2.2 });
   drawFit(ctx, "MAIS INFORMAÇÕES E", X(94), Y(944), { font: F.m6, size: 13.5 * K, maxW: X(220), fill: "#dccb97", align: "left" });
   drawFit(ctx, "AGENDAR UMA VISITA", X(94), Y(961), { font: F.m6, size: 13.5 * K, maxW: X(220), fill: "#dccb97", align: "left" });
   drawFit(ctx, BROKER.phone.replace(/[()]/g, ""), X(92), Y(990), { font: F.m8, size: 27 * K, maxW: X(220), fill: "#fff", align: "left" });
@@ -226,6 +224,6 @@ export async function renderMode3({ fields, photos: rawPhotos = [] }) {
   priceBox(ctx, f);
   await highlights(ctx, f);
   grid(ctx, imgs);
-  footer(ctx, f);
+  await footer(ctx, f);
   return canvas.encode("jpeg", 95);
 }
