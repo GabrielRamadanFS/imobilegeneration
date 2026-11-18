@@ -1,12 +1,16 @@
 // Provedor de ARTE (imagem 9:16 a partir do template + textos).
 // Interface: generateArt({ mode, template:{base64,mimeType}, fields, hasPhotos, signal })
 //            -> { buffer, model, keyed }   (keyed = áreas de foto vieram em magenta para a colagem)
-// Trocar de motor: ART_PROVIDER=<nome>. Plano B sem IA de imagem: "local" (template + textos
-// desenhados por código + fotos reais) — ainda não implementado; ver README.
+// Trocar de motor: ART_PROVIDER=<nome>.
+//   "local"  (padrão): desenha a arte por código (sem IA e sem custo) e cola as fotos reais.
+//   "gemini": pede a arte ao Gemini a partir do template (exige faturamento ativo no Google).
 
 import { MODELS, MODE_INFO, PROVIDERS } from "../config.js";
 import { FIELDS_BY_MODE } from "../fields.js";
 import { blockReason, callGemini, imageOf } from "../gemini.js";
+import { renderMode1 } from "../render/mode1.js";
+import { renderMode2 } from "../render/mode2.js";
+import { renderMode3 } from "../render/mode3.js";
 
 export function buildArtPrompt({ mode, fields, hasPhotos }) {
   const list = (FIELDS_BY_MODE[mode] || [])
@@ -55,7 +59,17 @@ async function gemini({ mode, template, fields, hasPhotos, signal }) {
   return { buffer: Buffer.from(img.base64, "base64"), model, keyed: Boolean(hasPhotos) };
 }
 
-const PROVIDERS_ART = { gemini };
+const RENDERERS = { 1: renderMode1, 2: renderMode2, 3: renderMode3 };
+
+// Gerador local: a arte já sai pronta (textos e fotos reais incluídos), sem etapa de magenta.
+async function local({ mode, fields, photos = [] }) {
+  const render = RENDERERS[mode];
+  if (!render) throw new Error(`Modo ${mode} sem layout local.`);
+  const buffer = await render({ fields, photos });
+  return { buffer, model: "local-render", keyed: false };
+}
+
+const PROVIDERS_ART = { local, gemini };
 
 export async function generateArt(args) {
   const impl = PROVIDERS_ART[PROVIDERS.art];

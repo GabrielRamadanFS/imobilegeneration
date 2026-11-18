@@ -5,6 +5,7 @@ import sharp from "sharp";
 process.env.APP_PIN = "pin-ficticio-de-teste";
 process.env.GEMINI_API_KEY = "test-key";
 process.env.MAX_PIN_FAILS = "3";
+process.env.ART_PROVIDER = "gemini"; // estes testes cobrem o provedor Gemini; o gerador local tem test/local-art.test.js
 
 const { default: verifyPin } = await import("../netlify/functions/verify-pin.js");
 const { default: analyze, buildSchema, buildPrompt } = await import("../netlify/functions/analyze.js");
@@ -108,7 +109,7 @@ describe("analyze", () => {
     };
     const out = await (await analyze(post("/api/analyze", { pin: "pin-ficticio-de-teste", rawText: "casa" }))).json();
     assert.equal(calls.length, 2);
-    assert.match(calls[0], /gemini-3\.8-flash/);
+    assert.match(calls[0], /gemini-3\.1-flash-lite/);
     assert.match(calls[1], /gemini-3\.5-flash-lite/);
     assert.equal(out.model, "gemini-3.5-flash-lite");
   });

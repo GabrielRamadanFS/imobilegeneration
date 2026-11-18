@@ -1,6 +1,6 @@
 import { checkAuth, generationAllowed, registerGeneration } from "./lib/auth.js";
 import { composePhotos, toStoryJpeg } from "./lib/compose.js";
-import { LIMITS } from "./lib/config.js";
+import { LIMITS, PROVIDERS } from "./lib/config.js";
 import { loadTemplate } from "./lib/templates.js";
 import { clientIp, json, methodGuard, readJson } from "./lib/http.js";
 import { generateArt } from "./lib/providers/art.js";
@@ -39,7 +39,8 @@ export default async (req) => {
       let heartbeat;
       try {
         send({ type: "status", message: `Carregando modelo oficial (Modo ${mode})...` });
-        const template = await loadTemplate(mode, req.url);
+        // O gerador local desenha a arte do zero; só o Gemini precisa do template como referência.
+        const template = PROVIDERS.art === "local" ? null : await loadTemplate(mode, req.url);
 
         send({ type: "status", message: "Gerando arte em alta definição (9:16)..." });
         heartbeat = setInterval(
@@ -47,7 +48,7 @@ export default async (req) => {
           2500,
         );
 
-        const art = await generateArt({ mode, template, fields: body.fields, hasPhotos: photos.length > 0 });
+        const art = await generateArt({ mode, template, fields: body.fields, photos, hasPhotos: photos.length > 0 });
 
         let finalBuf;
         if (art.keyed && photos.length) {

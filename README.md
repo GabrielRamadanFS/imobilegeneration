@@ -55,10 +55,12 @@ scripts/fetch-assets.sh    baixa refs/modo1-3.jpg e favicon do site antigo
   descontinuado (404, 429, 5xx ou "not found"), o próximo da lista é usado sem intervenção.
 - **Texto (legendas/campos):** `TEXT_PROVIDER`. Para usar o Claude, crie um provedor com a mesma assinatura
   (`generateStructured({prompt, schema}) -> {json, model}`) em `lib/providers/text.js` e registre em `PROVIDERS_TEXT`.
-- **Arte:** `ART_PROVIDER`. O Claude não gera imagens. Plano B sem modelo de imagem: provedor `local`, que monta
-  a arte com o template + textos desenhados por código (SVG/sharp) + fotos reais. Mantém o mesmo contrato
-  (`generateArt -> {buffer, model, keyed}`). Ainda não implementado: precisa das coordenadas de cada campo nos
-  3 templates.
+- **Arte:** `ART_PROVIDER` (padrão `local`). O provedor `local` desenha a arte por código (@napi-rs/canvas), sem IA
+  de imagem e sem custo: refaz os 3 layouts (`lib/render/mode1|2|3.js`), cola as fotos reais, escreve os textos
+  exatos e usa o logo em `assets/logo.png`. Fontes em `assets/fonts` (Anton, Montserrat, Great Vibes, Playfair
+  Display; todas licença OFL). `ART_PROVIDER=gemini` mantém o caminho antigo, que exige faturamento ativo no Google.
+  Mesmo contrato nos dois: `generateArt -> {buffer, model, keyed}`.
+- Os templates em `public/refs` ficam commitados; o script `scripts/fetch-assets.sh` só baixa o que faltar.
 
 ## Pontos de atenção (não verificados em produção)
 
